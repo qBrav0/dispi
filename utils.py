@@ -36,23 +36,23 @@ class Lists:
         self.members_to_projects_list = get_members_to_projects_list()
 
     def return_members(self):
-        return self.members
+        return self.members_list
     
     def return_projects(self):
-        return self.projects
+        return self.projects_list
     
     def return_members_to_projects(self):
-        return self.members_to_projects
+        return self.members_to_projects_list
     
     def update_all_lists(self):
-        self.members = get_members_list()
-        self.projects = get_projects_list()
-        self.members_to_projects = get_members_to_projects_list()
+        self.members_list = get_members_list()
+        self.projects_list = get_projects_list()
+        self.members_to_projects_list = get_members_to_projects_list()
 
     def login_exist(self, login):
         '''Checks if such a login exists'''
         for member in self.members_list:
-            if member[2] == login:
+            if member[1] == login:
                 return True
         return False
 

@@ -13,7 +13,7 @@ class SQLighter:
     def select_all_members(self):
         """Повертаєм всіх мемберів """
         with self.connection:            
-            return self.cursor.execute("SELECT * FROM 'members' WHERE 'deleted' = 0").fetchall()    
+            return self.cursor.execute("SELECT * FROM members WHERE deleted = 0").fetchall()    
         
     def select_all_projects(self):
         """Повертаєм всі проєкти"""
