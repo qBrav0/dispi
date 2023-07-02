@@ -31,9 +31,9 @@ class Lists:
     list of connection betwen members and projects"""
 
     def __init__(self):
-        self.members_list = get_members_list()
-        self.projects_list = get_projects_list()
-        self.members_to_projects_list = get_members_to_projects_list()
+        self.members_list = return_members_list()
+        self.projects_list = return_projects_list()
+        self.members_to_projects_list = return_members_to_projects_list()
 
     def return_members(self):
         return self.members_list
@@ -45,9 +45,9 @@ class Lists:
         return self.members_to_projects_list
     
     def update_all_lists(self):
-        self.members_list = get_members_list()
-        self.projects_list = get_projects_list()
-        self.members_to_projects_list = get_members_to_projects_list()
+        self.members_list = return_members_list()
+        self.projects_list = return_projects_list()
+        self.members_to_projects_list = return_members_to_projects_list()
 
     def login_exist(self, login):
         '''Checks if such a login exists'''
@@ -56,13 +56,13 @@ class Lists:
                 return True
         return False
 
-    def get_password_for_login(self, login ):
+    def return_password_for_login(self, login ):
         '''Returns the password for the given login'''
         for member in self.members_list:
             if member[1] == login:
                 return member[2]
 
-def get_members_list():
+def return_members_list():
     '''Getting members list
     Returns:
       list of members - list'''
@@ -71,7 +71,7 @@ def get_members_list():
     db.close()
     return members_list
 
-def get_projects_list():
+def return_projects_list():
     '''Getting projects list
     Returns:
       list of projects - list'''
@@ -80,7 +80,7 @@ def get_projects_list():
     db.close()
     return projects_list
 
-def get_members_to_projects_list():
+def return_members_to_projects_list():
     '''Getting members to projects list
     Returns:
       list of connection members to projects - list'''
@@ -89,7 +89,16 @@ def get_members_to_projects_list():
     db.close()
     return members_to_projects_list
 
-def register_new_member(member):
+def register_new_member(member,chat_id):
     db = SQLighter(database_name)
-    db.add_member(member['reg_login'],member['reg_password'],member['reg_telegram_username'])
+    db.add_member(member['reg_login'],member['reg_password'],member['reg_telegram_username'], chat_id)
     db.close()
+
+def return_admins_chat_ids(members_list):
+    admins_chat_ids = []
+    for member in members_list:
+        if member[11] == 1:
+            admins_chat_ids.append(member[12]) 
+
+    return admins_chat_ids
+

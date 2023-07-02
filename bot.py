@@ -13,6 +13,7 @@ list_fri = utils.Lists()
 
 @bot.message_handler(commands=['start'])
 def start(message):  
+    print(list_fri.return_members())
     bot.set_state(message.from_user.id, UserStates.start_menu, message.chat.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     hello_button = types.KeyboardButton('Салют!')
@@ -50,7 +51,7 @@ def сheck_for_registration_or_login(message):
 @bot.message_handler(state = UserStates.enter_login)
 def enter_login(message):
     """Перевірка існування login та запит password"""
-
+    
     if message.text == 'Назад':
         
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -63,7 +64,7 @@ def enter_login(message):
 
     elif list_fri.login_exist(message.text):
         bot.set_state(message.from_user.id, UserStates.enter_password, message.chat.id)
-        bot.add_data(message.from_user.id, message.chat.id, password = list_fri.get_password_for_login(message.text))
+        bot.add_data(message.from_user.id, message.chat.id, password = list_fri.return_password_for_login(message.text))
         bot.send_message(message.chat.id, 'Введи пароль:')
 
     else:
@@ -137,10 +138,13 @@ def reg_telegram_username(message):
 def confirm_registration(message):    
     if message.text == 'Так, підверджую':
         with bot.retrieve_data(message.from_user.id, message.chat.id) as member:
-           utils.register_new_member(member)
+           utils.register_new_member(member, message.chat.id)
 
         bot.reset_data(message.from_user.id, message.chat.id)
         list_fri.update_all_lists()
+
+        for chat_id in utils.return_admins_chat_ids(list_fri.return_members()):
+            bot.send_message(chat_id, 'У вас нова заявка на реєстрацію')
 
         bot.send_message(message.chat.id, 'Реєсрація успішна, тепер ти можеш увійти.')
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
