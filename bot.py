@@ -13,7 +13,6 @@ list_fri = utils.Lists()
 
 @bot.message_handler(commands=['start'])
 def start(message):  
-    print(list_fri.return_members())
     bot.set_state(message.from_user.id, UserStates.start_menu, message.chat.id)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     hello_button = types.KeyboardButton('Салют!')
@@ -81,7 +80,17 @@ def password_get(message):
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         if data['password'] == message.text:
             bot.send_message(message.chat.id, 'Вхід успішний')
-            del data['password']
+            bot.reset_data(message.from_user.id, message.chat.id)
+            bot.set_state(message.from_user.id, UserStates.main_menu, message.chat.id)
+
+            keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)   
+            if message.chat.id in utils.return_admins_chat_ids(list_fri.return_members()):
+                view_new_members_button = types.KeyboardButton('Нові заявки')
+                keyboard.add(view_new_members_button)
+
+            test_buuton = types.KeyboardButton('Тестовий батон')
+            keyboard.add(test_buuton)
+            bot.send_message(message.chat.id, 'Обери, що хочеш', reply_markup=keyboard)
         else: 
             bot.send_message(message.chat.id, 'Пароль неправильний, спробуй ще раз!')
 
@@ -166,6 +175,13 @@ def confirm_registration(message):
     else:
         bot.send_message(message.chat.id, 'Невідома команда')
       
+@bot.message_handler(state = UserStates.main_menu)
+def main_menu(message):    
+    if message.text == 'Нові заявки':
+        bot.send_message(message.chat.id, 'Ти обрав нові заявки, далі нічого не буде')
+    elif message.text == 'Тестовий батон':
+        bot.send_message(message.chat.id, 'Ти обрав тестовий батон, батона немає')
+
 
 bot.add_custom_filter(custom_filters.StateFilter(bot))
 bot.infinity_polling()

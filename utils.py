@@ -9,6 +9,7 @@ class UserStates(StatesGroup):
     start_menu = State()
     сheck_for_registration_or_login = State()
     confirm_registration = State()
+    main_menu = State()
 
     #Entering states
     enter_login = State()
