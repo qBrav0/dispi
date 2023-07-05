@@ -26,11 +26,11 @@ class SQLighter:
             return self.cursor.execute("SELECT * FROM members_to_projects").fetchall()        
 
         
-    def add_member(self, login, password,telegram_username):
+    def add_member(self, login, password,telegram_username,chat_id):
         """ Додаєм мембера в базу"""
         with self.connection: 
-            self.cursor.execute("INSERT INTO members ('login','password','telegram_username') VALUES (?,?,?)",
-                                                        (login, password, telegram_username))
+            self.cursor.execute("INSERT INTO members ('login','password','telegram_username','chat_id') VALUES (?,?,?,?)",
+                                                        (login, password, telegram_username,chat_id))
             return self.connection.commit()
         
     def delete_member_with_telegram_username(self, t_username):
