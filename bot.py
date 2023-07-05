@@ -11,6 +11,7 @@ state_storage = StateMemoryStorage()
 bot = telebot.TeleBot(token, state_storage=state_storage)
 list_fri = utils.Lists()
 
+
 @bot.message_handler(commands=['start'])
 def start(message):  
     bot.set_state(message.from_user.id, UserStates.start_menu, message.chat.id)
@@ -106,13 +107,18 @@ def reg_login(message):
         bot.set_state(message.from_user.id, UserStates.сheck_for_registration_or_login, message.chat.id)
     else:
         bot.add_data(message.from_user.id, message.chat.id, reg_login = message.text)
-        bot.set_state(message.from_user.id, UserStates.reg_password, message.chat.id)
 
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         back_button = types.KeyboardButton('Назад')
         keyboard.add(back_button)
 
-        bot.send_message(message.chat.id, f'Я записав {message.text} як твій логін. Тепер придумай пароль:', reply_markup=keyboard)
+        if utils.uniqueness_of_the_login(message.text):
+            bot.send_message(message.chat.id, f'Я записав {message.text} як твій логін. Тепер придумай пароль:',
+                             reply_markup=keyboard)
+            bot.set_state(message.from_user.id, UserStates.reg_password, message.chat.id)
+        else:
+            bot.send_message(message.chat.id, 'Вже існує користувач з таким логіном, виберіть інший логін:',
+                             reply_markup=keyboard)
     
 @bot.message_handler(state = UserStates.reg_password)
 def reg_password(message):
