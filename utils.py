@@ -93,3 +93,15 @@ def register_new_member(member):
     db = SQLighter(database_name)
     db.add_member(member['reg_login'],member['reg_password'],member['reg_telegram_username'])
     db.close()
+
+list_fri = Lists()
+
+def uniqueness_of_the_login(login):
+    """Перевіряє логін на унікальність"""
+    members = list_fri.return_members()
+    members_logins = [member[1] for member in members]
+    for log in members_logins:
+        if login == log:
+            return False
+
+    return True
