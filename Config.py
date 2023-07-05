@@ -1,2 +1,2 @@
-token = '6142550701:AAH2Imzwr1GUogXfZG1MM7Hbu7OqPSd03rs'
+token = '6201744043:AAGJtsurBD1HaBDCmBkaQKKR8a4AMp8H5tk'
 database_name = 'fri.db'
