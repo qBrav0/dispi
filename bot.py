@@ -3,6 +3,8 @@ import utils
 from config import token
 from utils import UserStates
 
+#///
+
 from telebot import types
 from telebot import custom_filters
 from telebot.storage import StateMemoryStorage
@@ -10,7 +12,6 @@ from telebot.storage import StateMemoryStorage
 state_storage = StateMemoryStorage()
 bot = telebot.TeleBot(token, state_storage=state_storage)
 list_fri = utils.Lists()
-
 
 @bot.message_handler(commands=['start'])
 def start(message):  
