@@ -1,6 +1,6 @@
 import telebot
 import utils
-from config import token
+from Configonfig import token
 from utils import UserStates
 
 from telebot import types
