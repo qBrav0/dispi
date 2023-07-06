@@ -103,11 +103,11 @@ def return_admins_chat_ids(members_list):
 
     return admins_chat_ids
 
-list_fri = Lists()
 
-def uniqueness_of_the_login(login):
+
+def uniqueness_of_the_login(login, members):
     """Перевіряє логін на унікальність"""
-    members = list_fri.return_members()
+
     members_logins = [member[1] for member in members]
     for log in members_logins:
         if login == log:

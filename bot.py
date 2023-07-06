@@ -1,6 +1,6 @@
 import telebot
 import utils
-from config import token
+from Config import token
 from utils import UserStates
 
 from telebot import types
@@ -112,7 +112,7 @@ def reg_login(message):
         back_button = types.KeyboardButton('Назад')
         keyboard.add(back_button)
 
-        if utils.uniqueness_of_the_login(message.text):
+        if utils.uniqueness_of_the_login(message.text, list_fri.return_members()):
             bot.send_message(message.chat.id, f'Я записав {message.text} як твій логін. Тепер придумай пароль:',
                              reply_markup=keyboard)
             bot.set_state(message.from_user.id, UserStates.reg_password, message.chat.id)
