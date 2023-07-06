@@ -3,8 +3,6 @@ import utils
 from config import token
 from utils import UserStates
 
-#///
-
 from telebot import types
 from telebot import custom_filters
 from telebot.storage import StateMemoryStorage
@@ -86,7 +84,8 @@ def password_get(message):
             bot.set_state(message.from_user.id, UserStates.main_menu, message.chat.id)
 
             keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)   
-            if message.chat.id in utils.return_admins_chat_ids(list_fri.return_members()):
+            
+            if message.chat.id in list_fri.return_admins_chat_ids(list_fri.return_members()):
                 view_new_members_button = types.KeyboardButton('Нові заявки')
                 keyboard.add(view_new_members_button)
 
@@ -159,7 +158,7 @@ def confirm_registration(message):
         bot.reset_data(message.from_user.id, message.chat.id)
         list_fri.update_all_lists()
 
-        for chat_id in utils.return_admins_chat_ids(list_fri.return_members()):
+        for chat_id in list_fri.return_admins_chat_ids(list_fri.return_members()):
             bot.send_message(chat_id, 'У вас нова заявка на реєстрацію')
 
         bot.send_message(message.chat.id, 'Реєсрація успішна, тепер ти можеш увійти.')

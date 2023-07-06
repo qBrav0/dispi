@@ -57,11 +57,20 @@ class Lists:
                 return True
         return False
 
-    def return_password_for_login(self, login ):
+    def return_password_for_login(self, login):
         '''Returns the password for the given login'''
         for member in self.members_list:
             if member[1] == login:
                 return member[2]
+            
+    def return_admins_chat_ids(members_list):
+        admins_chat_ids = []
+        for member in members_list:
+            if member[11] == 1:
+                admins_chat_ids.append(member[12]) 
+    
+        return admins_chat_ids
+    
 
 def return_members_list():
     '''Getting members list
@@ -95,17 +104,10 @@ def register_new_member(member,chat_id):
     db.add_member(member['reg_login'],member['reg_password'],member['reg_telegram_username'], chat_id)
     db.close()
     
-def return_admins_chat_ids(members_list):
-    admins_chat_ids = []
-    for member in members_list:
-        if member[11] == 1:
-            admins_chat_ids.append(member[12]) 
-
-    return admins_chat_ids
 
 list_fri = Lists()
 
-def uniqueness_of_the_login(login):
+def uniqueness_of_the_login(login, members):
     """Перевіряє логін на унікальність"""
     members = list_fri.return_members()
     members_logins = [member[1] for member in members]
