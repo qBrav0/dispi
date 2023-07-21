@@ -39,6 +39,16 @@ class SQLighter:
             self.cursor.execute("UPDATE members SET deleted = 1 WHERE t_username = ?", (t_username,))
             return self.connection.commit()        
 
+    def add_new_project(self, project_name, curator_id):
+        with self.connection:
+            self.cursor.execute("INSERT INTO projects ('name','curator_id') VALUES (?,?)",(project_name, curator_id))
+            return self.connection.commit()
+        
+    def return_user_id_by_chat_id(self,chat_id):
+        """Повертє id користувача за його chat id """
+        pass
+
+    
     def close(self):
         """ Закриваємо поточне з'єднання  БД """
         self.connection.close()

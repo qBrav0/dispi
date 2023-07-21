@@ -1,6 +1,6 @@
 from telebot.handler_backends import State, StatesGroup 
 from SQLighter import SQLighter
-from config import database_name
+from Config import database_name
 
 class UserStates(StatesGroup):
     '''Class for defining states'''
@@ -24,6 +24,10 @@ class UserStates(StatesGroup):
     reg_surname = State()
     reg_patronymic = State()
 
+    #Projects states
+    reg_new_project = State()
+    project_filter = State()
+    check_projects = State()
 
 class Lists:
     """Class for lists:
@@ -63,14 +67,30 @@ class Lists:
             if member[1] == login:
                 return member[2]
             
-    def return_admins_chat_ids(members_list):
+    def return_admins_chat_ids(self):
         admins_chat_ids = []
-        for member in members_list:
+        for member in self.members_list:
             if member[11] == 1:
                 admins_chat_ids.append(member[12]) 
     
         return admins_chat_ids
-    
+
+    def return_user_id_by_login(self, login):
+        """Повертає id користувача в БД за його логіном"""
+        for member in self.members_list:
+            if login == member[1]:
+                return member[0]
+
+
+    def uniqueness_of_the_login(self, login):
+        """Перевіряє логін на унікальність"""
+
+        members_logins = [member[1] for member in self.members_list]
+        for log in members_logins:
+            if login == log:
+                return False
+
+        return True
 
 def return_members_list():
     '''Getting members list
@@ -103,16 +123,12 @@ def register_new_member(member,chat_id):
     db = SQLighter(database_name)
     db.add_member(member['reg_login'],member['reg_password'],member['reg_telegram_username'], chat_id)
     db.close()
+
+def add_new_project(project):
+    db = SQLighter(database_name)
+    db.add_new_project(project['project_name'],project['curator_id'])   
+    db.close()
     
 
-list_fri = Lists()
 
-def uniqueness_of_the_login(login, members):
-    """Перевіряє логін на унікальність"""
-    members = list_fri.return_members()
-    members_logins = [member[1] for member in members]
-    for log in members_logins:
-        if login == log:
-            return False
 
-    return True
