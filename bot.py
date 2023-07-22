@@ -10,7 +10,39 @@ from telebot.storage import StateMemoryStorage
 state_storage = StateMemoryStorage()
 bot = telebot.TeleBot(token, state_storage=state_storage)
 list_fri = utils.Lists()
+new_users_info = None
+new_users = None
 
+
+def next_or_back(message_id, chat_id, deleted = 0):
+    """Відправляє виправлене повідомлення з слідуючою або попередньою новою заявкою"""
+
+    keyboard = types.InlineKeyboardMarkup()
+    if new_users_info != 0:
+        back_button = types.InlineKeyboardButton(text='Попередня', callback_data='back')
+    no_button = types.InlineKeyboardButton(text='Відхилити', callback_data='no')
+    yes_button = types.InlineKeyboardButton(text='Підтвердити', callback_data='yes')
+    if (len(new_users) - 1 > new_users_info and deleted == 0) or (len(new_users) - 2 > new_users_info and deleted == 1):
+        next_button = types.InlineKeyboardButton(text='Наступна', callback_data='next')
+    if new_users_info != 0 and len(new_users) - 1 > new_users_info:
+        keyboard.add(back_button, next_button)
+    elif new_users_info != 0:
+        keyboard.add(back_button)
+    elif (len(new_users) - 1 > new_users_info and deleted == 0) or (len(new_users) - 2 > new_users_info and deleted == 1):
+        keyboard.add(next_button)
+    keyboard.add(no_button, yes_button)
+    if deleted == 1:
+        if len(new_users) == 1:
+            bot.edit_message_text(message_id = message_id, chat_id = chat_id, text = 'Немає більше нових заявок')
+        elif len(new_users) - 1 == new_users_info:
+            nu_info = new_users_info - 1
+        else:
+            nu_info = new_users_info + 1
+    elif deleted == 0:
+        nu_info = new_users_info
+    if len(new_users) != 1:
+        bot.edit_message_text(message_id = message_id, chat_id = chat_id, text =  new_users[nu_info][0] + ' ' + new_users[nu_info][1],
+                        reply_markup=keyboard)
 
 @bot.message_handler(commands=['start'])
 def start(message):  
@@ -145,7 +177,7 @@ def reg_telegram_username(message):
         yes_button = types.KeyboardButton('Так, підверджую')
         no_button = types.KeyboardButton('Ні, я передумав. Хочу ще подумати.')
         keyboard.add(yes_button, no_button)
-        bot.send_message(message.chat.id, f'Я запам\'ятав твою базову інфломацію. залишилось тільки підтвердити реєстрацію, натиснувши на кнопку нижче.',reply_markup=keyboard)
+        bot.send_message(message.chat.id, f'Я запам\'ятав твою базову інформацію. залишилось тільки підтвердити реєстрацію, натиснувши на кнопку нижче.',reply_markup=keyboard)
 
 
 
@@ -184,12 +216,58 @@ def confirm_registration(message):
 @bot.message_handler(state = UserStates.main_menu)
 def main_menu(message):    
     if message.text == 'Нові заявки':
-        bot.send_message(message.chat.id, 'Ти обрав нові заявки, далі нічого не буде')
+        bot.send_message(message.chat.id, 'Введи пароль від свого акаунту, щоб ми були впевнені що ти маєш право на перегляд заяв')    #просто щоб він ввів текст і
+                                                                                                                           #перейти на повідомлення те що нам треба
+        bot.set_state(message.from_user.id, UserStates.new_application, message.chat.id)
     elif message.text == 'Тестовий батон':
         bot.send_message(message.chat.id, 'Ти обрав тестовий батон, батона немає')
 
 
+@bot.message_handler(state = UserStates.new_application)
+def confirm_reg(message):
+    global new_users_info
+    global new_users
+
+    list_fri.update_all_lists()
+    new_users = utils.return_new_users_info(list_fri.return_members())
+
+    if new_users == []:
+        bot.send_message(message.chat.id, 'Немає нових заявок')
+    else:
+        keyboard = types.InlineKeyboardMarkup()
+        no_button = types.InlineKeyboardButton(text='Відхилити', callback_data='no')
+        yes_button = types.InlineKeyboardButton(text='Підтвердити', callback_data='yes')
+        if len(new_users) > 1:
+            next_button = types.InlineKeyboardButton(text='Наступна', callback_data='next')
+            keyboard.add(next_button)
+        keyboard.add(no_button, yes_button)
+        bot.send_message(message.chat.id, new_users[0][0] + ' ' + new_users[0][1], reply_markup=keyboard)
+        new_users_info = 0
+
+
+@bot.callback_query_handler(func = lambda call: True)
+def callback(call):
+    global new_users_info
+    global new_users
+
+    if call.data == 'back':
+        new_users_info = new_users_info - 1
+        next_or_back(call.message.message_id, call.message.chat.id)
+    elif call.data == 'no':
+        utils.change_delete(new_users[new_users_info][1], 1)
+        next_or_back(call.message.message_id, call.message.chat.id, 1)
+        del new_users[new_users_info]
+        if len(new_users) == new_users_info:
+            new_users_info = new_users_info - 1
+    elif call.data == 'yes':
+        utils.change_delete(new_users[new_users_info][1], 0)
+        next_or_back(call.message.message_id, call.message.chat.id, 1)
+        del new_users[new_users_info]
+        if len(new_users) == new_users_info:
+            new_users_info = new_users_info - 1
+    elif call.data == 'next':
+        new_users_info = new_users_info + 1
+        next_or_back(call.message.message_id, call.message.chat.id)
+
 bot.add_custom_filter(custom_filters.StateFilter(bot))
 bot.infinity_polling()
-
-

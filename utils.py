@@ -1,6 +1,6 @@
 from telebot.handler_backends import State, StatesGroup 
 from SQLighter import SQLighter
-from config import database_name
+from Config import database_name
 
 class UserStates(StatesGroup):
     '''Class for defining states'''
@@ -10,6 +10,7 @@ class UserStates(StatesGroup):
     сheck_for_registration_or_login = State()
     confirm_registration = State()
     main_menu = State()
+    new_application = State()
 
     #Entering states
     enter_login = State()
@@ -102,6 +103,23 @@ def return_admins_chat_ids(members_list):
             admins_chat_ids.append(member[12]) 
 
     return admins_chat_ids
+
+def return_new_users_info(members_list):
+    """Повертає список користувачів, яких ще не підтвердили. Виводить нік і профіль в Телеграм"""
+
+    new_users_info = []
+    for member in members_list:
+        if member[10] == 2:
+            new_users_info.append([member[1], member[6]])
+
+    return new_users_info
+
+def change_delete(t_username, d):
+    """Змінює в базі данних поле delete на значення d"""
+
+    db = SQLighter(database_name)
+    db.delete_or_update_member_with_telegram_username(t_username, d)
+    db.close()
 
 
 
